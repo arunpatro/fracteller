@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
 
-padimg = lambda img: img #np.pad(img, ((2, 0), (0, 2), (0, 0)), 'constant', constant_values=255)
+def padimg(img, x=4):
+    i = img[x:-x,x:-x,:]
+    i = np.pad(i, ((x, x), (x, x), (0, 0)), 'constant', constant_values=255)
+    return i
 
-def frackteller(img):
-    
-    one = recursiveFunc(img, 5)
+def frackteller(img, n=5):
+    one = recursiveFunc(img, n)
     two = np.rot90(one)
     three = np.rot90(two)
     four = np.rot90(three)
@@ -16,9 +18,8 @@ def frackteller(img):
 def recursiveFunc(img, n):
     if n == 1:
         topright = 255 * np.ones(img.shape).astype(np.uint8)
-        topright_p = padimg(topright)
         img_p = padimg(img)
-        final = np.hstack([np.vstack([topright_p, img_p]), np.vstack([topright_p, topright_p])])
+        final = np.hstack([np.vstack([topright, img_p]), np.vstack([topright, topright])])
         return final
     else:
         imghalf = cv2.resize(img, None, fx=0.5,fy=0.5)
@@ -28,18 +29,12 @@ def recursiveFunc(img, n):
                            
         top_p = padimg(top)
         right_p = padimg(right)
-        topright_p = padimg(topright)
         img_p = padimg(img)
         
-        # print(f'{top_p.shape, right_p.shape, topright_p.shape, img_p.shape}')
-        final = np.hstack([np.vstack([top_p, img_p]), np.vstack([topright_p, right_p])])
+        final = np.hstack([np.vstack([top_p, img_p]), np.vstack([topright, right_p])])
         return final
         
 if __name__ == __main__:
     img = cv2.imread('xxxxxxx.jpg')
     zz = frackteller(img)
     cv2.imwrite('out.png', zz)
-
-
-        
-        
